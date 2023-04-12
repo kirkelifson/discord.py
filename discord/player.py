@@ -641,12 +641,14 @@ class AudioPlayer(threading.Thread):
         client: VoiceClient,
         *,
         after: Optional[Callable[[Optional[Exception]], Any]] = None,
+        after_args
     ) -> None:
         threading.Thread.__init__(self)
         self.daemon: bool = True
         self.source: AudioSource = source
         self.client: VoiceClient = client
         self.after: Optional[Callable[[Optional[Exception]], Any]] = after
+        self.after_args = after_args
 
         self._end: threading.Event = threading.Event()
         self._resumed: threading.Event = threading.Event()
@@ -708,7 +710,7 @@ class AudioPlayer(threading.Thread):
 
         if self.after is not None:
             try:
-                self.after(error)
+                self.after(error, self.after_args)
             except Exception as exc:
                 exc.__context__ = error
                 _log.exception('Calling the after function failed.', exc_info=exc)

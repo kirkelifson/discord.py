@@ -564,7 +564,7 @@ class VoiceClient(VoiceProtocol):
 
         return header + box.encrypt(bytes(data), bytes(nonce)).ciphertext + nonce[:4]
 
-    def play(self, source: AudioSource, *, after: Optional[Callable[[Optional[Exception]], Any]] = None) -> None:
+    def play(self, source: AudioSource, *, after: Optional[Callable[[Optional[Exception]], Any]] = None, after_args = None) -> None:
         """Plays an :class:`AudioSource`.
 
         The finalizer, ``after`` is called after the source has been exhausted
@@ -608,7 +608,7 @@ class VoiceClient(VoiceProtocol):
         if not self.encoder and not source.is_opus():
             self.encoder = opus.Encoder()
 
-        self._player = AudioPlayer(source, self, after=after)
+        self._player = AudioPlayer(source, self, after=after, after_args=after_args)
         self._player.start()
 
     def is_playing(self) -> bool:
